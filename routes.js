@@ -12,10 +12,13 @@ var dirname = configuration.dirname
 var log_file = fs.createWriteStream(dirname+'\debug.log',{flags:'a'});
 var log_stdout = process.stdout;
 
+var error_file = fs.createWriteStream(dirname+'\errorLog.log',{flags:'a'});
+var error_stdout = process.stdout;
 
-logger = function(d){
-    log_file.write(util.format(d)+'\n');
-    log_stdout.write(util.format(d)+'\n');
+
+logger = function(log){
+    log_file.write(util.format(log)+'\n');
+    log_stdout.write(util.format(log)+'\n');
 
 
     // fs.appendFile(dirname+'\debug.log',d,function(err){
@@ -23,6 +26,11 @@ logger = function(d){
     //     console.log("Saved")
     // })
 };
+
+errorLogger = function(log){
+    error_file.write(util.format(log)+'\n');
+    error_stdout.write(util.format(log)+'\n');
+}
 
 
 
@@ -72,6 +80,8 @@ var appRouter = function (app) {
             exampleEmail: faker.internet.exampleEmail()
         }
         logger(user)
+
+        errorLogger(user)
 
         res.status(200).send(user);
     })
