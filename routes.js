@@ -1,8 +1,28 @@
 var mysql = require('./mysql.js')
+var configuration = require('./config.js')
 var faker = require("faker")
 var request = require('request');
 var MongoClient = require('mongodb').MongoClient
 var sql = require('mysql');
+
+var fs = require('fs');
+var util = require('util')
+var dirname = configuration.dirname
+
+var log_file = fs.createWriteStream(dirname+'\debug.log',{flags:'a'});
+var log_stdout = process.stdout;
+
+
+logger = function(d){
+    log_file.write(util.format(d)+'\n');
+    log_stdout.write(util.format(d)+'\n');
+
+
+    // fs.appendFile(dirname+'\debug.log',d,function(err){
+    //     if (err) throw err;
+    //     console.log("Saved")
+    // })
+};
 
 
 
@@ -51,7 +71,7 @@ var appRouter = function (app) {
             ipv6: faker.internet.ipv6(),
             exampleEmail: faker.internet.exampleEmail()
         }
-
+        logger(user)
 
         res.status(200).send(user);
     })
@@ -118,17 +138,22 @@ var appRouter = function (app) {
         if(req.query.email){
             if(req.query.password){
             connection.query("select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'",function(err,rows,fields){
-                if (err) res.status(200).send({ message: "Something went wrong" });
+                if (err) res.status(500).send({ message: "Something went wrong" });
                 if(rows.length){
-                    res.status(500).send({data : rows, success: true});    
+                    res.status(500).send({data : rows, success: true,message: "Valid User"});    
                 }else{
-                    res.status(500).send({ message: "No Data Found" ,success: false,data:[]});
+                    res.status(500).send({ message: "No User Found" ,success: false,data:[]});
                 }
             })}else{
                 res.status(500).send({ message: "Please Enter Password" ,success: false,data:[]});
             }
         }else{
-            res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
+            if(req.query.password){
+                res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
+            }else{
+                res.status(500).send({ message: "Please Enter Email Id and Password" ,success: false,data:[]});
+            }
+            
         }
     })
 
