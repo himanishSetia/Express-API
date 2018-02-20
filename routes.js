@@ -2,7 +2,7 @@ var mysql = require('./mysql.js')
 var configuration = require('./config.js')
 var faker = require("faker")
 var request = require('request');
-var MongoClient = require('mongodb').MongoClient
+// var MongoClient = require('mongodb').MongoClient
 var sql = require('mysql');
 
 var fs = require('fs');
@@ -100,20 +100,20 @@ var appRouter = function (app) {
 
 
 
-    app.get("/getMongoData", function (req, res) {
-        MongoClient.connect('mongodb://locahost:27017/userDB', function (err, db) {
-            if (err) throw err
+    // app.get("/getMongoData", function (req, res) {
+    //     MongoClient.connect('mongodb://locahost:27017/userDB', function (err, db) {
+    //         if (err) throw err
 
-            db.collection('users').find().toArray(function (err, result) {
-                if (err) throw err
+    //         db.collection('users').find().toArray(function (err, result) {
+    //             if (err) throw err
 
-                res.status(200).send(result);
-            })
+    //             res.status(200).send(result);
+    //         })
 
-        })
+    //     })
 
 
-    })
+    // })
 
     app.get("/getSqlData",function(req,res){
 
@@ -144,23 +144,29 @@ var appRouter = function (app) {
             database : 'movieDB'
         })
         connection.connect();
-
+        var loginQuery = "select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'";
+        logger(loginQuery)
         if(req.query.email){
             if(req.query.password){
-            connection.query("select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'",function(err,rows,fields){
+            connection.query(loginQuery,function(err,rows,fields){
                 if (err) res.status(500).send({ message: "Something went wrong" });
                 if(rows.length){
+                    logger("User Found")
                     res.status(500).send({data : rows, success: true,message: "Valid User"});    
                 }else{
+                    errorLogger("No User Found")
                     res.status(500).send({ message: "No User Found" ,success: false,data:[]});
                 }
             })}else{
+                errorLogger("Please Enter Password")
                 res.status(500).send({ message: "Please Enter Password" ,success: false,data:[]});
             }
         }else{
             if(req.query.password){
+                errorLogger("Please Enter Email Id")
                 res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
             }else{
+                errorLogger("Please Enter Email Id and Password")
                 res.status(500).send({ message: "Please Enter Email Id and Password" ,success: false,data:[]});
             }
             
