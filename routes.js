@@ -10,9 +10,9 @@ var sql = require('mysql');
 var appRouter = function (app) {
     app.get("/users", function (req, res) {
         console.log("REQ PARAMS ", req.params)
-        utility.logger("/users PARAMS ", req.params)
+        // utility.logger("/users PARAMS ", req.params)
         console.log("REQ QUERY ", req.query)
-        utility.logger("/users QUERY ", req.query)
+        // utility.logger("/users QUERY ", req.query)
         var data = []
         var number = req.query.number
         if (isFinite(number) && number > 0) {
@@ -52,10 +52,10 @@ var appRouter = function (app) {
             ipv6: faker.internet.ipv6(),
             exampleEmail: faker.internet.exampleEmail()
         }
-        utility.logger(user)
+        // utility.logger(user)
         console.log(user)
 
-        utility.errorLogger(user)
+        // utility.errorLogger(user)
 
         res.status(200).send(user);
     })
@@ -83,29 +83,29 @@ var appRouter = function (app) {
         })
         connection.connect();
         var loginQuery = "select * from login where email='" + req.query.email + "' and password='" + req.query.password + "'";
-        logger(loginQuery)
+        console.log(loginQuery)
         if (req.query.email) {
             if (req.query.password) {
                 connection.query(loginQuery, function (err, rows, fields) {
                     if (err) res.status(500).send({ message: "Something went wrong" });
                     if (rows.length) {
-                        logger("User Found")
+                        console.log("User Found")
                         res.status(500).send({ data: rows, success: true, message: "Valid User" });
                     } else {
-                        errorLogger("No User Found")
+                        console.log("No User Found")
                         res.status(500).send({ message: "No User Found", success: false, data: [] });
                     }
                 })
             } else {
-                errorLogger("Please Enter Password")
+                console.log("Please Enter Password")
                 res.status(500).send({ message: "Please Enter Password", success: false, data: [] });
             }
         } else {
             if (req.query.password) {
-                errorLogger("Please Enter Email Id")
+                console.log("Please Enter Email Id")
                 res.status(500).send({ message: "Please Enter Email Id", success: false, data: [] });
             } else {
-                errorLogger("Please Enter Email Id and Password")
+                console.log("Please Enter Email Id and Password")
                 res.status(500).send({ message: "Please Enter Email Id and Password", success: false, data: [] });
             }
 
