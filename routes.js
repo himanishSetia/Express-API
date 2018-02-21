@@ -7,6 +7,7 @@ var request = require('request');
 var sql = require('mysql');
 
 
+
 var appRouter = function (app) {
     app.get("/users", function (req, res) {
         console.log("REQ PARAMS ", req.params)
@@ -84,6 +85,7 @@ var appRouter = function (app) {
         connection.connect();
         var loginQuery = "select * from login where email='" + req.query.email + "' and password='" + req.query.password + "'";
         console.log(loginQuery)
+        console.log("HOST ",configuration.host)
         if (req.query.email) {
             if (req.query.password) {
                 connection.query(loginQuery, function (err, rows, fields) {
