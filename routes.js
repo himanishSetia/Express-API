@@ -87,6 +87,7 @@ var appRouter = function (app) {
         if (req.query.email) {
             if (req.query.password) {
                 connection.query(loginQuery, function (err, rows, fields) {
+                    console.log("ROWSSSSSSSSSSSSSSSSSSSSS ",rows)
                     if (err) res.status(500).send({ message: "Something went wrong" });
                     if (rows.length) {
                         console.log("User Found")
