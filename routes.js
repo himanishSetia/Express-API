@@ -89,12 +89,15 @@ var appRouter = function (app) {
                 connection.query(loginQuery, function (err, rows, fields) {
                     console.log("ROWSSSSSSSSSSSSSSSSSSSSS ",rows)
                     if (err) res.status(500).send({ message: "Something went wrong" });
+                    if(rows != undefined && rows != null && rows != ''){
                     if (rows.length) {
                         console.log("User Found")
                         res.status(500).send({ data: rows, success: true, message: "Valid User" });
                     } else {
                         console.log("No User Found")
                         res.status(500).send({ message: "No User Found", success: false, data: [] });
+                    }}else{
+                        res.status(500).send({ message: "Error occured", success: false, data: [] });
                     }
                 })
             } else {
