@@ -3,16 +3,16 @@ var configuration = require('./config.js')
 var faker = require("faker")
 var request = require('request');
 // var MongoClient = require('mongodb').MongoClient
-var sql = require('mysql');
+// var sql = require('mysql');
 
 var fs = require('fs');
 var util = require('util')
 var dirname = configuration.dirname
 
-var log_file = fs.createWriteStream(dirname+'\debug.log',{flags:'a'});
+var log_file = fs.createWriteStream('debug.log',{flags:'a'});
 var log_stdout = process.stdout;
 
-var error_file = fs.createWriteStream(dirname+'\errorLog.log',{flags:'a'});
+var error_file = fs.createWriteStream('errorLog.log',{flags:'a'});
 var error_stdout = process.stdout;
 
 
@@ -80,6 +80,7 @@ var appRouter = function (app) {
             exampleEmail: faker.internet.exampleEmail()
         }
         logger(user)
+        console.log(user)
 
         errorLogger(user)
 
@@ -115,63 +116,63 @@ var appRouter = function (app) {
 
     // })
 
-    app.get("/getSqlData",function(req,res){
+    // app.get("/getSqlData",function(req,res){
 
-        var connection = sql.createConnection({
-            host : req.query.host,
-            user : req.query.user,
-            password : req.query.password,
-            database : req.query.db
-        })
-        connection.connect();
+    //     var connection = sql.createConnection({
+    //         host : req.query.host,
+    //         user : req.query.user,
+    //         password : req.query.password,
+    //         database : req.query.db
+    //     })
+    //     connection.connect();
 
-        if(req.query.table){
-        connection.query('select * from '+req.query.table,function(err,rows,fields){
-            if (err) res.status(200).send({ message: "Table Name not Valid" });
+    //     if(req.query.table){
+    //     connection.query('select * from '+req.query.table,function(err,rows,fields){
+    //         if (err) res.status(200).send({ message: "Table Name not Valid" });
 
-            res.status(200).send(rows);
-        })}else{
-            res.status(500).send({ message: "Oops! Please Enter Table Name" });
-        }
-    })
+    //         res.status(200).send(rows);
+    //     })}else{
+    //         res.status(500).send({ message: "Oops! Please Enter Table Name" });
+    //     }
+    // })
 
 
-    app.get('/login',function(req,res){
-        var connection = sql.createConnection({
-            host : 'localhost',
-            user : 'root',
-            password : '',
-            database : 'movieDB'
-        })
-        connection.connect();
-        var loginQuery = "select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'";
-        logger(loginQuery)
-        if(req.query.email){
-            if(req.query.password){
-            connection.query(loginQuery,function(err,rows,fields){
-                if (err) res.status(500).send({ message: "Something went wrong" });
-                if(rows.length){
-                    logger("User Found")
-                    res.status(500).send({data : rows, success: true,message: "Valid User"});    
-                }else{
-                    errorLogger("No User Found")
-                    res.status(500).send({ message: "No User Found" ,success: false,data:[]});
-                }
-            })}else{
-                errorLogger("Please Enter Password")
-                res.status(500).send({ message: "Please Enter Password" ,success: false,data:[]});
-            }
-        }else{
-            if(req.query.password){
-                errorLogger("Please Enter Email Id")
-                res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
-            }else{
-                errorLogger("Please Enter Email Id and Password")
-                res.status(500).send({ message: "Please Enter Email Id and Password" ,success: false,data:[]});
-            }
+    // app.get('/login',function(req,res){
+    //     var connection = sql.createConnection({
+    //         host : 'localhost',
+    //         user : 'root',
+    //         password : '',
+    //         database : 'movieDB'
+    //     })
+    //     connection.connect();
+    //     var loginQuery = "select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'";
+    //     logger(loginQuery)
+    //     if(req.query.email){
+    //         if(req.query.password){
+    //         connection.query(loginQuery,function(err,rows,fields){
+    //             if (err) res.status(500).send({ message: "Something went wrong" });
+    //             if(rows.length){
+    //                 logger("User Found")
+    //                 res.status(500).send({data : rows, success: true,message: "Valid User"});    
+    //             }else{
+    //                 errorLogger("No User Found")
+    //                 res.status(500).send({ message: "No User Found" ,success: false,data:[]});
+    //             }
+    //         })}else{
+    //             errorLogger("Please Enter Password")
+    //             res.status(500).send({ message: "Please Enter Password" ,success: false,data:[]});
+    //         }
+    //     }else{
+    //         if(req.query.password){
+    //             errorLogger("Please Enter Email Id")
+    //             res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
+    //         }else{
+    //             errorLogger("Please Enter Email Id and Password")
+    //             res.status(500).send({ message: "Please Enter Email Id and Password" ,success: false,data:[]});
+    //         }
             
-        }
-    })
+    //     }
+    // })
 
 
 }

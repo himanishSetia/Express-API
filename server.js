@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 routes(app);
 
 
-var server = app.listen(3000,function(){
-    
+var server = app.listen(8080,function(){
+    console.log("App Running on port number "+server.address().port)
     logger("App Running on port number "+server.address().port)
 });
