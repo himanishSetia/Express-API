@@ -1,43 +1,18 @@
 var mysql = require('./mysql.js')
 var configuration = require('./config.js')
+var utility = require('./utility.js')
 var faker = require("faker")
 var request = require('request');
-// var MongoClient = require('mongodb').MongoClient
-// var sql = require('mysql');
-
-var fs = require('fs');
-var util = require('util')
-var dirname = configuration.dirname
-
-var log_file = fs.createWriteStream('debug.log',{flags:'a'});
-var log_stdout = process.stdout;
-
-var error_file = fs.createWriteStream('errorLog.log',{flags:'a'});
-var error_stdout = process.stdout;
-
-
-logger = function(log){
-    log_file.write(util.format(log)+'\n');
-    log_stdout.write(util.format(log)+'\n');
-
-
-    // fs.appendFile(dirname+'\debug.log',d,function(err){
-    //     if (err) throw err;
-    //     console.log("Saved")
-    // })
-};
-
-errorLogger = function(log){
-    error_file.write(util.format(log)+'\n');
-    error_stdout.write(util.format(log)+'\n');
-}
-
+var MongoClient = require('mongodb').MongoClient
+var sql = require('mysql');
 
 
 var appRouter = function (app) {
     app.get("/users", function (req, res) {
         console.log("REQ PARAMS ", req.params)
+        utility.logger("/users PARAMS ", req.params)
         console.log("REQ QUERY ", req.query)
+        utility.logger("/users QUERY ", req.query)
         var data = []
         var number = req.query.number
         if (isFinite(number) && number > 0) {
@@ -50,8 +25,6 @@ var appRouter = function (app) {
                 }
                 data.push(user)
             }
-
-
             res.status(200).send(data);
         } else if (number == 0 && number == "0") {
             res.status(500).send({ message: "Oops! Number cannot be zero" });
@@ -79,10 +52,10 @@ var appRouter = function (app) {
             ipv6: faker.internet.ipv6(),
             exampleEmail: faker.internet.exampleEmail()
         }
-        logger(user)
+        utility.logger(user)
         console.log(user)
 
-        errorLogger(user)
+        utility.errorLogger(user)
 
         res.status(200).send(user);
     })
@@ -101,6 +74,45 @@ var appRouter = function (app) {
 
 
 
+    app.get('/login', function (req, res) {
+        var connection = sql.createConnection({
+            host: configuration.host,
+            user: configuration.user,
+            password: configuration.password,
+            database: 'DB'
+        })
+        connection.connect();
+        var loginQuery = "select * from login where email='" + req.query.email + "' and password='" + req.query.password + "'";
+        logger(loginQuery)
+        if (req.query.email) {
+            if (req.query.password) {
+                connection.query(loginQuery, function (err, rows, fields) {
+                    if (err) res.status(500).send({ message: "Something went wrong" });
+                    if (rows.length) {
+                        logger("User Found")
+                        res.status(500).send({ data: rows, success: true, message: "Valid User" });
+                    } else {
+                        errorLogger("No User Found")
+                        res.status(500).send({ message: "No User Found", success: false, data: [] });
+                    }
+                })
+            } else {
+                errorLogger("Please Enter Password")
+                res.status(500).send({ message: "Please Enter Password", success: false, data: [] });
+            }
+        } else {
+            if (req.query.password) {
+                errorLogger("Please Enter Email Id")
+                res.status(500).send({ message: "Please Enter Email Id", success: false, data: [] });
+            } else {
+                errorLogger("Please Enter Email Id and Password")
+                res.status(500).send({ message: "Please Enter Email Id and Password", success: false, data: [] });
+            }
+
+        }
+    })
+
+
     // app.get("/getMongoData", function (req, res) {
     //     MongoClient.connect('mongodb://locahost:27017/userDB', function (err, db) {
     //         if (err) throw err
@@ -114,64 +126,6 @@ var appRouter = function (app) {
     //     })
 
 
-    // })
-
-    // app.get("/getSqlData",function(req,res){
-
-    //     var connection = sql.createConnection({
-    //         host : req.query.host,
-    //         user : req.query.user,
-    //         password : req.query.password,
-    //         database : req.query.db
-    //     })
-    //     connection.connect();
-
-    //     if(req.query.table){
-    //     connection.query('select * from '+req.query.table,function(err,rows,fields){
-    //         if (err) res.status(200).send({ message: "Table Name not Valid" });
-
-    //         res.status(200).send(rows);
-    //     })}else{
-    //         res.status(500).send({ message: "Oops! Please Enter Table Name" });
-    //     }
-    // })
-
-
-    // app.get('/login',function(req,res){
-    //     var connection = sql.createConnection({
-    //         host : 'localhost',
-    //         user : 'root',
-    //         password : '',
-    //         database : 'movieDB'
-    //     })
-    //     connection.connect();
-    //     var loginQuery = "select * from login where email='"+req.query.email+"' and password='"+req.query.password+"'";
-    //     logger(loginQuery)
-    //     if(req.query.email){
-    //         if(req.query.password){
-    //         connection.query(loginQuery,function(err,rows,fields){
-    //             if (err) res.status(500).send({ message: "Something went wrong" });
-    //             if(rows.length){
-    //                 logger("User Found")
-    //                 res.status(500).send({data : rows, success: true,message: "Valid User"});    
-    //             }else{
-    //                 errorLogger("No User Found")
-    //                 res.status(500).send({ message: "No User Found" ,success: false,data:[]});
-    //             }
-    //         })}else{
-    //             errorLogger("Please Enter Password")
-    //             res.status(500).send({ message: "Please Enter Password" ,success: false,data:[]});
-    //         }
-    //     }else{
-    //         if(req.query.password){
-    //             errorLogger("Please Enter Email Id")
-    //             res.status(500).send({ message: "Please Enter Email Id" ,success: false,data:[]});
-    //         }else{
-    //             errorLogger("Please Enter Email Id and Password")
-    //             res.status(500).send({ message: "Please Enter Email Id and Password" ,success: false,data:[]});
-    //         }
-            
-    //     }
     // })
 
 
