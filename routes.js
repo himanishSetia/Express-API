@@ -90,29 +90,41 @@ var appRouter = function (app) {
             if (req.query.password) {
                 connection.query(loginQuery, function (err, rows, fields) {
                     console.log("ROWSSSSSSSSSSSSSSSSSSSSS ",rows)
-                    if (err) res.status(500).send({ message: "Something went wrong" });
+                    // if (err) res.status(500).send({ message: "Something went wrong" });
                     if(rows != undefined && rows != null && rows != ''){
                     if (rows.length) {
                         console.log("User Found")
-                        res.status(500).send({ data: rows, success: true, message: "Valid User" });
+                        res.writeHead(200, {"Content-Type": "application/json"});
+                        res.end(JSON.stringify({ data: rows, success: true, message: "Valid User" }));
+                        // res.status(500).send({ data: rows, success: true, message: "Valid User" });
                     } else {
                         console.log("No User Found")
-                        res.status(500).send({ message: "No User Found", success: false, data: [] });
+                        res.writeHead(200, {"Content-Type": "application/json"});
+                        res.end(JSON.stringify({ message: "No User Found", success: false, data: [] }));
+                        // res.status(500).send({ message: "No User Found", success: false, data: [] });
                     }}else{
-                        res.status(500).send({ message: "Error occured", success: false, data: [] });
+                        res.writeHead(200, {"Content-Type": "application/json"});
+                        res.end(JSON.stringify({ message: "Error occured", success: false, data: [] }));
+                        // res.status(500).send({ message: "Error occured", success: false, data: [] });
                     }
                 })
             } else {
                 console.log("Please Enter Password")
-                res.status(500).send({ message: "Please Enter Password", success: false, data: [] });
+                res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify({ message: "Please Enter Password", success: false, data: [] }));
+                // res.status(500).send({ message: "Please Enter Password", success: false, data: [] });
             }
         } else {
             if (req.query.password) {
                 console.log("Please Enter Email Id")
-                res.status(500).send({ message: "Please Enter Email Id", success: false, data: [] });
+                res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify({ message: "Please Enter Email Id", success: false, data: [] }));
+                // res.status(500).send({ message: "Please Enter Email Id", success: false, data: [] });
             } else {
                 console.log("Please Enter Email Id and Password")
-                res.status(500).send({ message: "Please Enter Email Id and Password", success: false, data: [] });
+                res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify({ message: "Please Enter Email Id and Password", success: false, data: [] }));
+                // res.status(500).send({ message: "Please Enter Email Id and Password", success: false, data: [] });
             }
 
         }
